@@ -32,7 +32,7 @@ endif()
 
 include_directories( inc )
 
-file ( GLOB SOURCES "./src/*.cpp" )
+file ( GLOB SOURCES "./src/*.cpp" "./src/app/*.cpp" )
 
 if (MSVC)
     add_compile_options(/W4 /WX)

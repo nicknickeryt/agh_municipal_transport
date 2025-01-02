@@ -12,9 +12,10 @@ private:
 
 public:
     Line(int number, const vector<Route>& routes);
+    Line(int number);
 
     void addRoute(const Route& route);
-    std::vector<Route>& getRoutes();
+    std::vector<Route> getRoutes() const;
     int getLineNumber() const;
 
 };

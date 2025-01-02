@@ -10,13 +10,11 @@ class Stop
 private:
     std::string stopName;
     int stopId;
-    int stopScheduleId; // New member variable
 public:
-    Stop(string name, int id, int scheduleId);
+    Stop(string name, int id);
 
     string getName() const;
     int getId() const;
-    int getScheduleId() const; // New method to get scheduleId
     void printInfo();    // New method to print information
 
     // this is required for using Stop as a key in a map lolz

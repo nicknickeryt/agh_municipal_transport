@@ -7,7 +7,7 @@
 #include "stop.h"
 #include "vehicle.h"
 
-using std::string, std::vector, std::map;
+using std::string, std::vector, std::map, std::pair;
 
 class Route {
 private:
@@ -20,6 +20,7 @@ public:
     void addStop(Stop stop, string arrivalTime);
     vector<Stop> getStops();
     map<Stop, string> getStopArrivals();
+    vector<pair<Stop, string>> getSortedStopArrivals();
     Vehicle getVehicle();
     void printInfo(); 
 

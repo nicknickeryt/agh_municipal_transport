@@ -16,23 +16,19 @@ class Vehicle {
     VehicleType vehicleType;
     string vehicleModel;
     int vehicleProdYear;
-    int vehicleCurrentLine;
-    int vehicleCurrentRouteID; // change to Route
 
 public:
-    Vehicle(int id, VehicleType type, string model, int prodYear, int currentLine, int currentRouteID);
-
-    void setID(int id);
-    void setCurrentLine(int id);
-    void setCurrentRouteID(int id);
+    Vehicle(int id, VehicleType type, string model, int prodYear);
 
     int getID();
     VehicleType getType();
     string getTypeString();
     string getModel();
     int getProdYear();
-    int getCurrentLine();
-    int getCurrentRouteID();
+
+    void setType(VehicleType type);
+    void setModel(string model);
+    void setProdYear(int year);
 
     void printInfo();
 };

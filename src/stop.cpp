@@ -6,8 +6,8 @@ using std::cout;
 using std::endl;
 using std::string;
 
-Stop::Stop(string name, int id, int scheduleId)
-    : stopName(name), stopId(id), stopScheduleId(scheduleId) {}
+Stop::Stop(string name, int id)
+    : stopName(name), stopId(id) {}
 
 string Stop::getName() const {
     return stopName;
@@ -17,12 +17,7 @@ int Stop::getId() const {
     return stopId;
 }
 
-int Stop::getScheduleId() const {
-    return stopScheduleId;
-}
-
 void Stop::printInfo(){
     cout << "Stop Name: " << stopName << endl;
     cout << "Stop ID: " << stopId << endl;
-    cout << "Schedule ID: " << stopScheduleId << endl;
 }

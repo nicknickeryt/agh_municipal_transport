@@ -4,27 +4,11 @@
 using std::cout;
 using std::endl;
 
-
-Vehicle::Vehicle(int id, VehicleType type, string model, int prodYear, int currentLine, int currentRouteID) : vehicleId(id),
-                                                                                                         vehicleType(type),
-                                                                                                         vehicleModel(model),
-                                                                                                         vehicleProdYear(prodYear),
-                                                                                                         vehicleCurrentLine(currentLine),
-                                                                                                         vehicleCurrentRouteID(currentRouteID)
+Vehicle::Vehicle(int id, VehicleType type, string model, int prodYear) : vehicleId(id),
+                                                                         vehicleType(type),
+                                                                         vehicleModel(model),
+                                                                         vehicleProdYear(prodYear)
 {
-}
-
-void Vehicle::setID(int id)
-{
-    vehicleId = id;
-}
-void Vehicle::setCurrentLine(int line)
-{
-    vehicleCurrentLine = line;
-}
-void Vehicle::setCurrentRouteID(int id)
-{
-    vehicleCurrentRouteID = id;
 }
 
 int Vehicle::getID()
@@ -37,7 +21,8 @@ VehicleType Vehicle::getType()
     return vehicleType;
 }
 
-string Vehicle::getTypeString(){
+string Vehicle::getTypeString()
+{
     switch (vehicleType)
     {
     case BUS:
@@ -65,21 +50,23 @@ int Vehicle::getProdYear()
     return vehicleProdYear;
 }
 
-int Vehicle::getCurrentLine()
+void Vehicle::setType(VehicleType type)
 {
-    return vehicleCurrentLine;
+    vehicleType = type;
+}
+void Vehicle::setModel(string model)
+{
+    vehicleModel = model;
+}
+void Vehicle::setProdYear(int year)
+{
+    vehicleProdYear = year;
 }
 
-int Vehicle::getCurrentRouteID()
+void Vehicle::printInfo()
 {
-    return vehicleCurrentRouteID;
-}
-
-void Vehicle::printInfo() {
     cout << "Vehicle ID: " << vehicleId << endl;
     cout << "Type: " << getTypeString() << endl;
     cout << "Model: " << vehicleModel << endl;
     cout << "Production Year: " << vehicleProdYear << endl;
-    cout << "Current Line: " << vehicleCurrentLine << endl;
-    cout << "Current Route ID: " << vehicleCurrentRouteID << endl;
 }
