@@ -1,23 +1,17 @@
-#include "stop.h"
-#include <iostream>
 #include <string>
+#include "stop.h"
 
-using std::cout;
-using std::endl;
-using std::string;
+using namespace std;
 
-Stop::Stop(string name, int id)
-    : stopName(name), stopId(id) {}
+ Stop::Stop(string name) : name(name) {}
+  Stop::Stop(string name, int id) : name(name), id(id) {}
 
-string Stop::getName() const {
-    return stopName;
-}
+  string Stop::getName() const { return name; }
+  void Stop::setName(string name) { this->name = name; }
 
-int Stop::getId() const {
-    return stopId;
-}
+  int Stop::getId() const { return id; }
+  void Stop::setId(int id) { this->id = id; }
 
-void Stop::printInfo(){
-    cout << "Stop Name: " << stopName << endl;
-    cout << "Stop ID: " << stopId << endl;
-}
+  bool Stop::operator<(const Stop &other) const {
+    return id < other.id || (id == other.id && name < other.name);
+  }

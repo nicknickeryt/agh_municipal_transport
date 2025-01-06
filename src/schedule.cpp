@@ -1,23 +1,41 @@
-#include "schedule.h"
+#include <map>
+#include <vector>
 #include <iostream>
 
-using std::cout, std::endl, std::string;
+#include "line.h"
+#include "schedule.h"
+#include "stop.h"
+#include "utils.h"
 
-void Schedule::printScheduleForStop(const Stop& stop, const std::vector<Line>& lines) {
-    for (const auto& line : lines) 
-        printScheduleForStop(stop, line);
+using namespace std;
+
+map<Direction, vector<string>>
+Schedule::getLineScheduleForStop(Line line, int stopId, ScheduleDay day) {
+  map<Direction, vector<string>> schedule;
+  for (auto direction : {Direction::A, Direction::B}) {
+    for (auto [stop, times] : line.getSchedule(day, direction)) {
+      if (stop.getId() == stopId)
+        schedule[direction] = times;
+    }
+  }
+  return schedule;
 }
 
-void Schedule::printScheduleForStop(const Stop& stop, const Line& line) {
+map<ScheduleDay, map<Direction, vector<string>>>
+Schedule::getLineScheduleForStop(Line line, int stopId) {
+  map<ScheduleDay, map<Direction, vector<string>>> schedule;
+  for (auto day :
+       {ScheduleDay::WORKDAY, ScheduleDay::SATURDAY, ScheduleDay::HOLIDAY}) {
+    schedule[day] = getLineScheduleForStop(line, stopId, day);
+  }
+  return schedule;
+}
 
-        cout << " Linia " << line.getLineNumber() << ":" << endl;
-        for (auto route : line.getRoutes()) {
-            try {
-                string arrivalTime = route.getStopArrivals()[stop];
-                vector<pair<Stop, string>> stops = route.getSortedStopArrivals();
-                cout << "  " << arrivalTime  << " [" << stops[0].first.getName() << " -> " << stops[stops.size() - 1].first.getName() << "]" << endl;
-            } catch (const std::out_of_range&) {
-                // Stop not found in this route, continue to the next route
-            }
-        }
+map<Line, map<ScheduleDay, map<Direction, vector<string>>>>
+Schedule::getAllSchedulesForStop(int stopId, vector<Line *> &lines) {
+  map<Line, map<ScheduleDay, map<Direction, vector<string>>>> schedule;
+  for (auto &line : lines) {
+    schedule[*line] = getLineScheduleForStop(*line, stopId);
+  }
+  return schedule;
 }

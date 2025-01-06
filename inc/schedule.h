@@ -1,11 +1,15 @@
 #pragma once
 
-#include "line.h"
-#include "stop.h"
-#include <vector>
+using namespace std;
 
 class Schedule {
 public:
-    static void printScheduleForStop(const Stop& stop, const std::vector<Line>& lines);
-    static void printScheduleForStop(const Stop& stop, const Line& line);
+  static map<Direction, vector<string>>
+  getLineScheduleForStop(Line line, int stopId, ScheduleDay day);
+
+  static map<ScheduleDay, map<Direction, vector<string>>>
+  getLineScheduleForStop(Line line, int stopId);
+
+  static map<Line, map<ScheduleDay, map<Direction, vector<string>>>>
+  getAllSchedulesForStop(int stopId, vector<Line *> &lines);
 };

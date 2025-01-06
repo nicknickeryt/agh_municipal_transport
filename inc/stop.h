@@ -1,24 +1,23 @@
-#pragma once 
+#pragma once
 
 #include <string>
-#include <vector>
 
-using std::string;
+using namespace std;
 
-class Stop
-{
+class Stop {
 private:
-    std::string stopName;
-    int stopId;
+  string name;
+  int id;
+
 public:
-    Stop(string name, int id);
+  Stop(string name);
+  Stop(string name, int id);
 
-    string getName() const;
-    int getId() const;
-    void printInfo();    // New method to print information
+  string getName() const;
+  void setName(string name);
 
-    // this is required for using Stop as a key in a map lolz
-    bool operator<(const Stop& other) const {
-        return stopId < other.stopId;
-    }
+  int getId() const;
+  void setId(int id);
+
+  bool operator<(const Stop &other) const;
 };
