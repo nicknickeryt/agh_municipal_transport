@@ -51,4 +51,5 @@ private:
 
   void showStopsList();
   void showStopSchedule();
+  void showStopScheduleForLine();
 };

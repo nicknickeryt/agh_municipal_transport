@@ -15,6 +15,7 @@ private:
   map<ScheduleDay, map<Direction, map<Stop, vector<string>>>> schedule;
 
 public:
+  Line(int number);
   Line(int number, vector<Stop> route);
 
   int getNumber() const;
@@ -22,6 +23,7 @@ public:
 
   vector<Stop> getRoute();
   void setRoute(vector<Stop> route);
+  bool hasStop(int stopId);
 
   map<ScheduleDay, map<Direction, map<Stop, vector<string>>>> getSchedule();
   void setSchedule(
@@ -39,4 +41,6 @@ public:
   string getTargetStop(Direction direction) const;
 
   bool operator<(const Line &other) const;
+
+  static Line* getLineById(vector<Line*> lines, int id);
 };

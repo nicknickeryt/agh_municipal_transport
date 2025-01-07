@@ -20,4 +20,6 @@ public:
   void setId(int id);
 
   bool operator<(const Stop &other) const;
+
+  bool operator==(const Stop &other) const;
 };

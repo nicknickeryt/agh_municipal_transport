@@ -1,5 +1,6 @@
 #include <map>
 #include <vector>
+#include <bits/stdc++.h>
 
 #include "line.h"
 #include "stop.h"
@@ -8,12 +9,17 @@
 using namespace std;
 
 Line::Line(int number, vector<Stop> route) : number(number), route(route) {}
+Line::Line(int number) : number(number) {}
 
 int Line::getNumber() const { return number; }
 void Line::setNumber(int number) { this->number = number; }
 
 vector<Stop> Line::getRoute() { return route; }
 void Line::setRoute(vector<Stop> route) { this->route = route; }
+
+bool Line::hasStop(int stopId) {
+  return count(route.begin(), route.end(), Stop("dummyStop", stopId));
+}
 
 map<ScheduleDay, map<Direction, map<Stop, vector<string>>>>
 Line::getSchedule() {
@@ -47,3 +53,12 @@ string Line::getTargetStop(Direction direction) const {
 }
 
 bool Line::operator<(const Line &other) const { return number < other.number; }
+
+Line* Line::getLineById(vector<Line*> lines, int id) {
+    for (Line* line : lines) {
+      if (line->getNumber() == id) {
+        return line;
+      }
+    }
+    return nullptr;
+  }

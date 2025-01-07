@@ -83,7 +83,7 @@ void App::setDemoData() {
   stops.push_back(dworzec);
   stops.push_back(szkola);
   stops.push_back(kabel);
-  
+
   lines.push_back(&line);
   lines.push_back(&line2);
 
@@ -108,28 +108,54 @@ void App::setDemoData() {
                      {kabel, {"10:41", "11:11"}}});
 }
 
+void showLineSchedule(const Line &line, map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule) {
+  cout << "\nLinia: " << line.getNumber() << endl;
+
+    for (auto &[day, daySchedule] : lineSchedule) {
+      cout << " Dzień: " << Utils::getScheduleDayName(day) << endl;
+      if (daySchedule.empty())
+        cout << "   Brak odjazdów" << endl;
+      for (auto &[direction, directionSchedule] : daySchedule) {
+        cout << "  Kierunek: " << line.getTargetStop(direction) << endl;
+        if (directionSchedule.empty())
+          cout << "   Brak odjazdów" << endl;
+        else
+          for (const auto &time : directionSchedule)
+            cout << "   " << time << endl;
+      }
+    }
+}
+
 void App::showStopSchedule() {
   cout << "Podaj ID przystanku\n";
   int choice = getUserInput();
-    auto scheduleAll = Schedule::getAllSchedulesForStop(choice, lines);
+  auto scheduleAll = Schedule::getAllSchedulesForStop(choice, lines);
 
   for (auto &[line, lineSchedule] : scheduleAll) {
-    cout << "Linia: " << line.getNumber() << endl;
-
-    for (auto &[day, daySchedule] : lineSchedule) {
-      cout << "Dzień: " << Utils::getScheduleDayName(day) << endl;
-
-      for (auto &[direction, directionSchedule] : daySchedule) {
-        cout << "Kierunek: " << line.getTargetStop(direction) << endl;
-        if (directionSchedule.empty())
-          cout << " Brak rozkładu" << endl;
-        else
-          for (const auto &time : directionSchedule)
-            cout << " " << time << endl;
-      }
-    }
+    if (lineSchedule.empty())
+      continue;
+    showLineSchedule(line, lineSchedule);
   }
 }
+
+void App::showStopScheduleForLine() {
+  cout << "Podaj ID przystanku\n";
+  int stopChoice = getUserInput();
+
+  cout << "Podaj numer linii\n";
+  int lineChoice = getUserInput();
+
+  Line * targetLine = Line::getLineById(lines, lineChoice);
+
+  if(targetLine == nullptr) {
+    cout << "Nie ma takiej linii." << endl;
+    return;
+  }
+
+  auto lineSchedule = Schedule::getLineScheduleForStop(*targetLine, stopChoice);
+
+  showLineSchedule(*targetLine, lineSchedule);
+  }
 
 void App::handleStopsMenu(int choice) {
   switch (choice) {
@@ -140,6 +166,7 @@ void App::handleStopsMenu(int choice) {
     showStopSchedule();
     break;
   case 3: /* Wyświetl rozkład przystanku dla linii */
+    showStopScheduleForLine();
     break;
   case 4:
     return; // Powrót do głównego menu
