@@ -38,9 +38,9 @@ public:
   void setSchedule(ScheduleDay day, Direction direction,
                    map<Stop, vector<string>> schedule);
 
-  string getTargetStop(Direction direction) const;
+  Stop getTargetStop(Direction direction) const;
 
   bool operator<(const Line &other) const;
 
-  static Line* getLineById(vector<Line*> lines, int id);
+  static Line &getLineById(vector<Line> &lines, int id);
 };

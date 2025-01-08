@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -22,4 +23,6 @@ public:
   bool operator<(const Stop &other) const;
 
   bool operator==(const Stop &other) const;
+
+  static Stop getStopById(vector<Stop> &stops, int stopId); 
 };

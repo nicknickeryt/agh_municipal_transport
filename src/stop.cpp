@@ -1,5 +1,7 @@
 #include "stop.h"
 #include <string>
+#include <vector>
+#include <stdexcept>
 
 using namespace std;
 
@@ -15,3 +17,12 @@ void Stop::setId(int id) { this->id = id; }
 bool Stop::operator<(const Stop &other) const { return id < other.id; }
 
 bool Stop::operator==(const Stop &other) const { return id == other.id; }
+
+Stop Stop::getStopById(vector<Stop> &stops, int stopId) {
+  for (auto &stop : stops) {
+    if (stop.getId() == stopId) {
+      return stop;
+    }
+  }
+  throw runtime_error("Stop not found");
+}

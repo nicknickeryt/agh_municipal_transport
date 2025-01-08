@@ -47,18 +47,18 @@ void Line::setSchedule(ScheduleDay day, Direction direction,
   this->schedule[day][direction] = schedule;
 }
 
-string Line::getTargetStop(Direction direction) const {
-  return direction == Direction::A ? route.back().getName()
-                                   : route.front().getName();
+Stop Line::getTargetStop(Direction direction) const {
+  return direction == Direction::A ? route.back()
+                                   : route.front();
 }
 
 bool Line::operator<(const Line &other) const { return number < other.number; }
 
-Line* Line::getLineById(vector<Line*> lines, int id) {
-    for (Line* line : lines) {
-      if (line->getNumber() == id) {
+Line& Line::getLineById(vector<Line> &lines, int id) {
+    for (Line &line : lines) {
+      if (line.getNumber() == id) {
         return line;
       }
     }
-    return nullptr;
+    throw runtime_error("Line with the given ID not found");
   }

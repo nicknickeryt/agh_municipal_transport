@@ -33,11 +33,11 @@ Schedule::getLineScheduleForStop(Line& line, int stopId) {
 }
 
 map<Line, map<ScheduleDay, map<Direction, vector<string>>>>
-Schedule::getAllSchedulesForStop(int stopId, vector<Line *> &lines) {
+Schedule::getAllSchedulesForStop(int stopId, vector<Line> &lines) {
   map<Line, map<ScheduleDay, map<Direction, vector<string>>>> schedule;
   for (auto &line : lines) {
-    if (line->hasStop(stopId))
-      schedule[*line] = getLineScheduleForStop(*line, stopId);
+    if (line.hasStop(stopId))
+      schedule[line] = getLineScheduleForStop(line, stopId);
   }
   return schedule;
 }

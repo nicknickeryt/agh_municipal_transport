@@ -11,5 +11,5 @@ public:
   getLineScheduleForStop(Line& line, int stopId);
 
   static map<Line, map<ScheduleDay, map<Direction, vector<string>>>>
-  getAllSchedulesForStop(int stopId, vector<Line *> &lines);
+  getAllSchedulesForStop(int stopId, vector<Line> &lines);
 };
