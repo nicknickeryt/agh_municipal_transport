@@ -8,14 +8,14 @@
 
 using namespace std;
 
-Line::Line(int number, vector<Stop> route) : number(number), route(route) {}
+Line::Line(int number, vector<Stop> &route) : number(number), route(route) {}
 Line::Line(int number) : number(number) {}
 
 int Line::getNumber() const { return number; }
 void Line::setNumber(int number) { this->number = number; }
 
 vector<Stop> Line::getRoute() { return route; }
-void Line::setRoute(vector<Stop> route) { this->route = route; }
+void Line::setRoute(vector<Stop> &route) { this->route = route; }
 
 bool Line::hasStop(int stopId) {
   return count(route.begin(), route.end(), Stop("dummyStop", stopId));
@@ -45,6 +45,10 @@ map<Stop, vector<string>> Line::getSchedule(ScheduleDay day,
 void Line::setSchedule(ScheduleDay day, Direction direction,
                        map<Stop, vector<string>> schedule) {
   this->schedule[day][direction] = schedule;
+}
+
+void Line::setSchedule(ScheduleDay day, Direction direction, Stop stop, vector<string> times) {
+  schedule[day][direction][stop] = times;
 }
 
 Stop Line::getTargetStop(Direction direction) const {

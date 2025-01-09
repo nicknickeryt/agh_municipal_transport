@@ -18,7 +18,7 @@ bool Stop::operator<(const Stop &other) const { return id < other.id; }
 
 bool Stop::operator==(const Stop &other) const { return id == other.id; }
 
-Stop Stop::getStopById(vector<Stop> &stops, int stopId) {
+Stop& Stop::getStopById(vector<Stop> &stops, int stopId) {
   for (auto &stop : stops) {
     if (stop.getId() == stopId) {
       return stop;

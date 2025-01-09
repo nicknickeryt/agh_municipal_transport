@@ -7,7 +7,8 @@
 
 using namespace std;
 
-class App {
+class App
+{
 public:
   static App &getInstance();
 
@@ -28,8 +29,11 @@ private:
   Stop szkola = Stop("Szkoła", 3);
   Stop kabel = Stop("Kabel", 4);
 
-  Line line1 = Line(1, {plac, dworzec, szkola});
-  Line line2 = Line(2, {kabel, szkola, dworzec});
+  vector<Stop> route1 = {plac, dworzec, szkola};
+  vector<Stop> route2 = {kabel, szkola, dworzec};
+
+  Line line1 = Line(1, route1);
+  Line line2 = Line(2, route2);
 
   void showMainMenu();
 
@@ -68,6 +72,30 @@ private:
   void showTargetLineStopAddMenu(Line &targetLine);
 
   void showTargetLineRoute(Line &targetLine);
+
+  void handleStopEditMenu(int choice);
+
+  void showStopEditMenu();
+
+  void handleStopDelete(Stop &stop);
+
+  void showStopDeleteMenu();
+
+  void showStopAddMenu();
+
+  void showTargetStopEditMenu();
+
+  void showTargetStopEditor(Stop &targetStop);
+
+  void handleTargetStopEditor(Stop &targetStop, int choice);
+
+  void handleTargetStopNameChange(Stop &targetStop);
+
+  void handleTargetStopIdChange(Stop &targetStop);
+
+  void showTargetStopScheduleEditMenu(Stop &targetStop);
+
+  void showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine);
 
   void showStopsList();
   void showStopSchedule();

@@ -24,5 +24,5 @@ public:
 
   bool operator==(const Stop &other) const;
 
-  static Stop getStopById(vector<Stop> &stops, int stopId); 
+  static Stop& getStopById(vector<Stop> &stops, int stopId); 
 };
