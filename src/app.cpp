@@ -23,6 +23,8 @@ App::App() {}
 
 void App::showMainMenu()
 {
+  adminAuthenticated = 0;
+  
   cout << "\nAGH Municipal Transport System\n";
   cout << "[1] Przystanki\n";
   cout << "[2] Lista linii\n";
@@ -892,10 +894,11 @@ void App::showEditorMenu()
 
   cout << "\n[1] Edytor przystanków\n";
   cout << "[2] Edytor linii\n";
+  cout << "[3] Ustaw nowe hasło administratora\n";
   cout << "[0] Powrót\n";
   cout << "Wybierz opcję:\n";
 
-  int choice = Utils::getUserInput(0, 2);
+  int choice = Utils::getUserInput(0, 3);
   handleEditorMenu(choice);
 }
 
@@ -909,6 +912,10 @@ void App::handleEditorMenu(int choice)
   case 2:
     showLineEditMenu();
     break;
+  case 3:
+    showAdminPasswordChangeMenu();
+    showMainMenu();
+    break;
   case 0:
     showMainMenu();
     return;
@@ -917,4 +924,10 @@ void App::handleEditorMenu(int choice)
     showEditorMenu();
     break;
   }
+}
+
+void App::showAdminPasswordChangeMenu() {
+  adminPassword = Utils::promptInput("Podaj nowe hasło:");
+  cout << "[i] Hasło zaktualizowano, zaloguj się ponownie." << endl;
+  adminAuthenticated = 0;
 }

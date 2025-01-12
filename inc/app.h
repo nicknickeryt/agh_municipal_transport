@@ -40,11 +40,10 @@ private:
 
   void showMainMenu();
 
-
   void handleMainMenu(int choice);
 
   void showLineSchedule(const Line &line,
-    map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule);
+                        map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule);
 
   void showStopsMenu();
 
@@ -106,4 +105,6 @@ private:
   void showStopSchedule();
   void showStopScheduleForLine();
   void showLinesList();
+
+  void showAdminPasswordChangeMenu();
 };
