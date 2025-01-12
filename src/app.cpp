@@ -100,27 +100,27 @@ void App::setDemoData()
   lines.push_back(line2);
 
   line1.setSchedule(ScheduleDay::WORKDAY, Direction::A,
-                    {{plac, {"10:00", "10:30"}},
-                     {dworzec, {"10:10", "10:40"}},
-                     {szkola, {"10:20", "10:50"}}});
+                    {{1, {"10:00", "10:30"}},
+                     {2, {"10:10", "10:40"}},
+                     {3, {"10:20", "10:50"}}});
 
   line1.setSchedule(ScheduleDay::WORKDAY, Direction::B,
-                    {{szkola, {"10:21", "10:51"}},
-                     {dworzec, {"10:31", "11:01"}},
-                     {plac, {"10:41", "11:11"}}});
+                    {{1, {"10:21", "10:51"}},
+                     {2, {"10:31", "11:01"}},
+                     {3, {"10:41", "11:11"}}});
 
   line2.setSchedule(ScheduleDay::WORKDAY, Direction::A,
-                    {{kabel, {"10:00", "10:30"}},
-                     {szkola, {"10:10", "10:40"}},
-                     {dworzec, {"10:20", "10:50"}}});
+                    {{4, {"10:00", "10:30"}},
+                     {3, {"10:10", "10:40"}},
+                     {2, {"10:20", "10:50"}}});
 
   line2.setSchedule(ScheduleDay::WORKDAY, Direction::B,
-                    {{dworzec, {"10:21", "10:51"}},
-                     {szkola, {"10:31", "11:01"}},
-                     {kabel, {"10:41", "11:11"}}});
+                    {{4, {"10:21", "10:51"}},
+                     {3, {"10:31", "11:01"}},
+                     {2, {"10:41", "11:11"}}});
 }
 
-void showLineSchedule(
+void App::showLineSchedule(
     const Line &line,
     map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule)
 {
@@ -133,7 +133,7 @@ void showLineSchedule(
       cout << "   Brak odjazdów" << endl;
     for (auto &[direction, directionSchedule] : daySchedule)
     {
-      cout << "  Kierunek: " << line.getTargetStop(direction).getName() << endl;
+      cout << "  Kierunek: " << Stop::getStopById(stops, line.getTargetStop(direction)).getName() << endl;
       if (directionSchedule.empty())
         cout << "   Brak odjazdów" << endl;
       else
@@ -187,15 +187,18 @@ void App::handleStopsMenu(int choice)
   {
   case 1:
     showStopsList();
+    showStopsMenu();
     break;
-  case 2: /* Wyświetl rozkład przystanku */
+  case 2: 
     showStopSchedule();
+    showStopsMenu();
     break;
-  case 3: /* Wyświetl rozkład przystanku dla linii */
+  case 3:
     showStopScheduleForLine();
+    showStopsMenu();
     break;
   case 4:
-    return; // Powrót do głównego menu
+    return; 
   default:
     cout << "Nieprawidłowy wybór!\n";
     break;
@@ -208,8 +211,8 @@ void App::showLinesList()
   for (auto &line : lines)
   {
     cout << " [" << line.getNumber() << "] "
-         << line.getTargetStop(Direction::A).getName() << " <-> "
-         << line.getTargetStop(Direction::B).getName() << endl;
+         << Stop::getStopById(stops, line.getTargetStop(Direction::B)).getName() << " <-> "
+         << Stop::getStopById(stops, line.getTargetStop(Direction::A)).getName() << endl;
   }
 }
 
@@ -236,7 +239,7 @@ void App::showLineAddMenu()
       return;
     }
 
-  vector<Stop> route{};
+  vector<int> route{};
 
   cout << "Podaj trasę linii:" << endl;
   uint32_t i = 1;
@@ -248,7 +251,7 @@ void App::showLineAddMenu()
     try
     {
       Stop stop = Stop::getStopById(stops, stopId);
-      route.push_back(stop);
+      route.push_back(stopId);
     }
     catch (const runtime_error &e)
     {
@@ -331,10 +334,8 @@ void App::showTargetLineStopDeleteMenu(Line &targetLine)
     return;
   }
 
-  Stop stop = Stop::getStopById(stops, stopId);
-
   auto route = targetLine.getRoute();
-  route.erase(std::remove(route.begin(), route.end(), stop), route.end());
+  route.erase(std::remove(route.begin(), route.end(), stopId), route.end());
   targetLine.setRoute(route);
 
   auto schedule = targetLine.getSchedule();
@@ -343,7 +344,7 @@ void App::showTargetLineStopDeleteMenu(Line &targetLine)
   {
     for (auto &[direction, stopTimes] : daySchedule)
     {
-      stopTimes.erase(stop);
+      stopTimes.erase(stopId);
     }
   }
 
@@ -352,9 +353,9 @@ void App::showTargetLineStopDeleteMenu(Line &targetLine)
 
 void App::showTargetLineRoute(Line &targetLine)
 {
-  for (const auto &stop : targetLine.getRoute())
+  for (const auto &stopId : targetLine.getRoute())
   {
-    cout << " » [" << stop.getId() << "] " << stop.getName() << endl;
+    cout << " » [" << stopId << "] " << Stop::getStopById(stops, stopId).getName() << endl;
   }
 }
 
@@ -371,7 +372,7 @@ void App::showTargetLineStopAddMenu(Line &targetLine)
   {
     Stop stop = Stop::getStopById(stops, stopId);
     auto route = targetLine.getRoute();
-    route.push_back(stop);
+    route.push_back(stopId);
     targetLine.setRoute(route);
   }
   catch (const runtime_error &e)
@@ -418,8 +419,8 @@ void App::handleTargetLineEditor(int choice, Line &targetLine)
 void App::showTargetLineEditor(Line &targetLine)
 {
   cout << "Edycja: [" << targetLine.getNumber() << "] "
-       << targetLine.getTargetStop(Direction::A).getName() << " <-> "
-       << targetLine.getTargetStop(Direction::B).getName() << endl;
+       << Stop::getStopById(stops, targetLine.getTargetStop(Direction::B)).getName() << " <-> "
+       << Stop::getStopById(stops, targetLine.getTargetStop(Direction::A)).getName() << endl;
 
   cout << "\n[1] Wyświetl całą trasę\n";
   cout << "[2] Zmień numer\n";
@@ -568,6 +569,29 @@ void App::handleTargetStopIdChange(Stop &targetStop)
     }
   }
 
+  for (auto &line : lines)
+  {
+    // Update the route
+    auto route = line.getRoute();
+    replace(route.begin(), route.end(), targetStop.getId(), stopId);
+    line.setRoute(route);
+
+    // Update the schedule
+    auto schedule = line.getSchedule();
+    for (auto &[day, daySchedule] : schedule)
+    {
+      for (auto &[direction, stopTimes] : daySchedule)
+      {
+        if (stopTimes.find(targetStop.getId()) != stopTimes.end())
+        {
+          stopTimes[stopId] = stopTimes[targetStop.getId()];
+          stopTimes.erase(targetStop.getId());
+        }
+      }
+    }
+    line.setSchedule(schedule);
+  }
+
   targetStop.setId(stopId);
 }
 
@@ -615,8 +639,8 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
     schedule[direction] = times;
   }
 
-  targetLine.setSchedule(scheduleDay, Direction::A, targetStop, schedule[Direction::A]);
-  targetLine.setSchedule(scheduleDay, Direction::B, targetStop, schedule[Direction::B]);
+  targetLine.setSchedule(scheduleDay, Direction::A, targetStop.getId(), schedule[Direction::A]);
+  targetLine.setSchedule(scheduleDay, Direction::B, targetStop.getId(), schedule[Direction::B]);
 
   cout << "[i] Rozkład został zaktualizowany." << endl;
 }

@@ -29,8 +29,8 @@ private:
   Stop szkola = Stop("Szkoła", 3);
   Stop kabel = Stop("Kabel", 4);
 
-  vector<Stop> route1 = {plac, dworzec, szkola};
-  vector<Stop> route2 = {kabel, szkola, dworzec};
+  vector<int> route1 = {1, 2, 3};
+  vector<int> route2 = {4, 3, 2};
 
   Line line1 = Line(1, route1);
   Line line2 = Line(2, route2);
@@ -40,6 +40,9 @@ private:
   int getUserInput();
 
   void handleMainMenu(int choice);
+
+  void showLineSchedule(const Line &line,
+    map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule);
 
   void showStopsMenu();
 

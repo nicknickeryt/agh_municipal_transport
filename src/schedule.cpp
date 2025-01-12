@@ -14,8 +14,8 @@ map<Direction, vector<string>>
 Schedule::getLineScheduleForStop(Line& line, int stopId, ScheduleDay day) {
   map<Direction, vector<string>> schedule;
   for (auto direction : {Direction::A, Direction::B}) {
-    for (auto [stop, times] : line.getSchedule(day, direction)) {
-      if (stop.getId() == stopId)
+    for (auto [scheduleStopId, times] : line.getSchedule(day, direction)) {
+      if (scheduleStopId == stopId)
         schedule[direction] = times;
     }
   }

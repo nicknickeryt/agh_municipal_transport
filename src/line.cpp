@@ -8,50 +8,50 @@
 
 using namespace std;
 
-Line::Line(int number, vector<Stop> &route) : number(number), route(route) {}
+Line::Line(int number, vector<int> &route) : number(number), route(route) {}
 Line::Line(int number) : number(number) {}
 
 int Line::getNumber() const { return number; }
 void Line::setNumber(int number) { this->number = number; }
 
-vector<Stop> Line::getRoute() { return route; }
-void Line::setRoute(vector<Stop> &route) { this->route = route; }
+vector<int> Line::getRoute() { return route; }
+void Line::setRoute(vector<int> &route) { this->route = route; }
 
 bool Line::hasStop(int stopId) {
-  return count(route.begin(), route.end(), Stop("dummyStop", stopId));
+  return count(route.begin(), route.end(), stopId);
 }
 
-map<ScheduleDay, map<Direction, map<Stop, vector<string>>>>
+map<ScheduleDay, map<Direction, map<int, vector<string>>>>
 Line::getSchedule() {
   return schedule;
 }
 void Line::setSchedule(
-    map<ScheduleDay, map<Direction, map<Stop, vector<string>>>> schedule) {
+    map<ScheduleDay, map<Direction, map<int, vector<string>>>> schedule) {
   this->schedule = schedule;
 }
 
-map<Direction, map<Stop, vector<string>>> Line::getSchedule(ScheduleDay day) {
+map<Direction, map<int, vector<string>>> Line::getSchedule(ScheduleDay day) {
   return schedule[day];
 }
 void Line::setSchedule(ScheduleDay day,
-                       map<Direction, map<Stop, vector<string>>> schedule) {
+                       map<Direction, map<int, vector<string>>> schedule) {
   this->schedule[day] = schedule;
 }
 
-map<Stop, vector<string>> Line::getSchedule(ScheduleDay day,
+map<int, vector<string>> Line::getSchedule(ScheduleDay day,
                                             Direction direction) {
   return schedule[day][direction];
 }
 void Line::setSchedule(ScheduleDay day, Direction direction,
-                       map<Stop, vector<string>> schedule) {
+                       map<int, vector<string>> schedule) {
   this->schedule[day][direction] = schedule;
 }
 
-void Line::setSchedule(ScheduleDay day, Direction direction, Stop stop, vector<string> times) {
+void Line::setSchedule(ScheduleDay day, Direction direction, int stop, vector<string> times) {
   schedule[day][direction][stop] = times;
 }
 
-Stop Line::getTargetStop(Direction direction) const {
+int Line::getTargetStop(Direction direction) const {
   return direction == Direction::A ? route.back()
                                    : route.front();
 }

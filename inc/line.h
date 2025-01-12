@@ -12,37 +12,36 @@ class Line
 {
 private:
   int number;
-  vector<Stop> route;
-  map<ScheduleDay, map<Direction, map<Stop, vector<string>>>> schedule;
+  vector<int> route; // Changed from vector<Stop> to vector<int>
+  map<ScheduleDay, map<Direction, map<int, vector<string>>>> schedule; // Changed Stop to int
 
-//TODO change vector<Stop> route to vector<int> route
 public:
   Line(int number);
-  Line(int number, vector<Stop> &route);
+  Line(int number, vector<int> &route); // Changed vector<Stop> to vector<int>
 
   int getNumber() const;
   void setNumber(int number);
 
-  vector<Stop> getRoute();
-  void setRoute(vector<Stop> &route);
+  vector<int> getRoute(); // Changed vector<Stop> to vector<int>
+  void setRoute(vector<int> &route); // Changed vector<Stop> to vector<int>
   bool hasStop(int stopId);
 
-  map<ScheduleDay, map<Direction, map<Stop, vector<string>>>> getSchedule();
+  map<ScheduleDay, map<Direction, map<int, vector<string>>>> getSchedule(); // Changed Stop to int
   void setSchedule(
-      map<ScheduleDay, map<Direction, map<Stop, vector<string>>>> schedule);
+      map<ScheduleDay, map<Direction, map<int, vector<string>>>> schedule); // Changed Stop to int
 
-  map<Direction, map<Stop, vector<string>>> getSchedule(ScheduleDay day);
+  map<Direction, map<int, vector<string>>> getSchedule(ScheduleDay day); // Changed Stop to int
 
   void setSchedule(ScheduleDay day,
-                   map<Direction, map<Stop, vector<string>>> schedule);
+                   map<Direction, map<int, vector<string>>> schedule); // Changed Stop to int
 
-  void setSchedule(ScheduleDay day, Direction direction, Stop stop, vector<string> times);
+  void setSchedule(ScheduleDay day, Direction direction, int stopId, vector<string> times); // Changed Stop to int
 
-  map<Stop, vector<string>> getSchedule(ScheduleDay day, Direction direction);
+  map<int, vector<string>> getSchedule(ScheduleDay day, Direction direction); // Changed Stop to int
   void setSchedule(ScheduleDay day, Direction direction,
-                   map<Stop, vector<string>> schedule);
+                   map<int, vector<string>> schedule); // Changed Stop to int
 
-  Stop getTargetStop(Direction direction) const;
+  int getTargetStop(Direction direction) const; // Changed Stop to int
 
   bool operator<(const Line &other) const;
 
