@@ -1,6 +1,6 @@
+#include <bits/stdc++.h>
 #include <map>
 #include <vector>
-#include <bits/stdc++.h>
 
 #include "line.h"
 #include "stop.h"
@@ -21,8 +21,7 @@ bool Line::hasStop(int stopId) {
   return count(route.begin(), route.end(), stopId);
 }
 
-map<ScheduleDay, map<Direction, map<int, vector<string>>>>
-Line::getSchedule() {
+map<ScheduleDay, map<Direction, map<int, vector<string>>>> Line::getSchedule() {
   return schedule;
 }
 void Line::setSchedule(
@@ -39,7 +38,7 @@ void Line::setSchedule(ScheduleDay day,
 }
 
 map<int, vector<string>> Line::getSchedule(ScheduleDay day,
-                                            Direction direction) {
+                                           Direction direction) {
   return schedule[day][direction];
 }
 void Line::setSchedule(ScheduleDay day, Direction direction,
@@ -47,22 +46,22 @@ void Line::setSchedule(ScheduleDay day, Direction direction,
   this->schedule[day][direction] = schedule;
 }
 
-void Line::setSchedule(ScheduleDay day, Direction direction, int stop, vector<string> times) {
+void Line::setSchedule(ScheduleDay day, Direction direction, int stop,
+                       vector<string> times) {
   schedule[day][direction][stop] = times;
 }
 
 int Line::getTargetStop(Direction direction) const {
-  return direction == Direction::A ? route.back()
-                                   : route.front();
+  return direction == Direction::A ? route.back() : route.front();
 }
 
 bool Line::operator<(const Line &other) const { return number < other.number; }
 
-Line& Line::getLineById(vector<Line> &lines, int id) {
-    for (Line &line : lines) {
-      if (line.getNumber() == id) {
-        return line;
-      }
+Line &Line::getLineById(vector<Line> &lines, int id) {
+  for (Line &line : lines) {
+    if (line.getNumber() == id) {
+      return line;
     }
-    throw runtime_error("Line with the given ID not found");
   }
+  throw runtime_error("Line with the given ID not found");
+}

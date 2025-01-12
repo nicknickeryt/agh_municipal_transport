@@ -4,10 +4,8 @@
 using namespace std;
 
 int main() {
-
   App& app = App::getInstance();
-
-  app.setDemoData();
+  
+  app.loadData(); 
   app.run();
-
 }

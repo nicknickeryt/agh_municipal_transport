@@ -14,10 +14,11 @@ public:
 
   void run();
 
-  void setDemoData();
+  void saveData();
+  void loadData();
 
 private:
-  App();
+  App() = default;
   App(const App &) = delete;
   App &operator=(const App &) = delete;
 

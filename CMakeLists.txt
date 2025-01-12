@@ -2,33 +2,22 @@ cmake_minimum_required(VERSION 3.24)
 
 project(
     agh_municipal_transport
-    VERSION 0.1
+    VERSION 0.99
     LANGUAGES CXX
 )
 
 include(FetchContent)
 
-# Fetch Bcrypt.cpp library
 FetchContent_Declare(
-  Bcrypt
-  GIT_REPOSITORY https://github.com/hilch/Bcrypt.cpp.git
-  GIT_TAG master
+  Boost
+  URL https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.xz
+  URL_MD5 d55d43218e81ca3d0fc14436b7665bf1
+  DOWNLOAD_EXTRACT_TIMESTAMP ON
+  EXCLUDE_FROM_ALL
 )
-FetchContent_MakeAvailable(Bcrypt)
-
-# Fetch yaml-cpp library
-FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-  GIT_TAG 0.8.0
-)
-FetchContent_MakeAvailable(yaml-cpp)
-
-if(NOT yaml-cpp_POPULATED)
-  message(STATUS "Fetching yaml-cpp...")
-  FetchContent_MakeAvailable(yaml-cpp)
-  add_subdirectory(${yaml-cpp_SOURCE_DIR} ${yaml-cpp_BINARY_DIR})
-endif()
+set(BOOST_INCLUDE_LIBRARIES serialization)
+set(BOOST_ENABLE_CMAKE ON)
+FetchContent_MakeAvailable(Boost)
 
 include_directories( inc )
 
@@ -41,4 +30,4 @@ else()
 endif()
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )
-target_link_libraries(${PROJECT_NAME} bcrypt yaml-cpp::yaml-cpp)
+target_link_libraries(${PROJECT_NAME} Boost::serialization)
