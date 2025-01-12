@@ -3,7 +3,9 @@
 #include <vector>
 #include <stdexcept>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::runtime_error;
 
 Stop::Stop(string name) : name(name) {}
 Stop::Stop(string name, int id) : name(name), id(id) {}

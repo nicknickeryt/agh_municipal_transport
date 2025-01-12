@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STOP_H
+#define STOP_H
 
 #include <string>
 #include <vector>
@@ -7,7 +8,8 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
-using namespace std;
+using std::string;
+using std::vector;
 
 class Stop {
 private:
@@ -39,3 +41,5 @@ public:
     ar & id;
   }
 };
+
+#endif // STOP_H

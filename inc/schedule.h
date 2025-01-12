@@ -1,6 +1,13 @@
-#pragma once
+#ifndef SCHEDULE_H
+#define SCHEDULE_H
 
-using namespace std;
+#include <map>
+#include <vector>
+#include <string>
+
+using std::vector;
+using std::map;
+using std::string;
 
 class Schedule {
 public:
@@ -13,3 +20,5 @@ public:
   static map<Line, map<ScheduleDay, map<Direction, vector<string>>>>
   getAllSchedulesForStop(int stopId, vector<Line> &lines);
 };
+
+#endif // SCHEDULE_H

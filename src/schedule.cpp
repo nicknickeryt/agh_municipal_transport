@@ -8,7 +8,9 @@
 #include "stop.h"
 #include "utils.h"
 
-using namespace std;
+using std::vector;
+using std::map;
+using std::string;
 
 map<Direction, vector<string>>
 Schedule::getLineScheduleForStop(Line& line, int stopId, ScheduleDay day) {

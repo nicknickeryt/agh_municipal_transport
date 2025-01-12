@@ -6,7 +6,10 @@
 #include "stop.h"
 #include "utils.h"
 
-using namespace std;
+using std::map;
+using std::vector;
+using std::string;
+using std::runtime_error;
 
 Line::Line(int number, vector<int> &route) : number(number), route(route) {}
 Line::Line(int number) : number(number) {}

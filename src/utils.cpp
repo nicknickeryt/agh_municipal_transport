@@ -3,10 +3,16 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <regex>
 
 #include "utils.h"
 
-using namespace std;
+using std::string;
+using std::map;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::invalid_argument;
 
 int Utils::getUserInput(int min, int max) {
   cout << "» ";
@@ -32,23 +38,6 @@ string Utils::getScheduleDayName(ScheduleDay day) {
   default:
     throw invalid_argument("Invalid ScheduleDay");
   }
-}
-
-int Utils::promptSel() {
-    int ret;
-
-    string input{};
-
-    while (1) {
-        cout << "» ";
-        cin >> input;
-        if (validateInt(input)) {
-            std::istringstream(input) >> ret;
-            break;
-        }
-        printErr(ERR_NAN);
-    }
-    return ret;
 }
 
 int Utils::promptSel(const map<int, string> promptMap) {
@@ -78,13 +67,6 @@ bool Utils::validateInt(const std::string &input) {
     return (iss >> value) && (iss.eof());
 }
 
-string Utils::promptInput() {
-    string ret{};
-    cout << "» ";
-    cin >> ret;
-    return ret;
-}
-
 string Utils::promptInput(const string promptText) {
 
     cout << promptText << endl;
@@ -97,13 +79,9 @@ string Utils::promptInput(const string promptText) {
     return ret;
 }
 
-int Utils::promptNumInput(const string promptText) {
-    cout << promptText << endl;
-
-    int ret{};
-    cout << "» ";
-    cin >> ret;
-    return ret;
-}
-
 void Utils::printErr(const string errText) { cout << "[!] " << errText << endl; }
+
+bool Utils::isValidTimeFormat(const std::string& time) {
+    std::regex timeFormat(R"(^([01]\d|2[0-3]):([0-5]\d)$)");
+    return std::regex_match(time, timeFormat);
+  }

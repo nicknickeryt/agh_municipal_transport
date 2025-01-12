@@ -1,14 +1,18 @@
-#pragma once
+#ifndef APP_H
+#define APP_H
 
+#include <map>
+#include <string>
 #include <vector>
 
-#include "stop.h"
 #include "line.h"
+#include "stop.h"
 
-using namespace std;
+using std::map;
+using std::string;
+using std::vector;
 
-class App
-{
+class App {
 public:
   static App &getInstance();
 
@@ -43,8 +47,9 @@ private:
 
   void handleMainMenu(int choice);
 
-  void showLineSchedule(const Line &line,
-                        map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule);
+  void showLineSchedule(
+      const Line &line,
+      map<ScheduleDay, map<Direction, vector<string>>> &lineSchedule);
 
   void showStopsMenu();
 
@@ -109,3 +114,5 @@ private:
 
   void showAdminPasswordChangeMenu();
 };
+
+#endif // APP_H

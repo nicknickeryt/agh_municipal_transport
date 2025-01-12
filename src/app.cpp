@@ -10,7 +10,17 @@
 #include "schedule.h"
 #include "stop.h"
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::map;
+using std::exception;
+using std::to_string;
+using std::runtime_error;
+using std::ifstream;
+using std::ofstream;
 
 App &App::getInstance() {
   static App instance;
@@ -89,9 +99,16 @@ void App::showLineSchedule(
            << endl;
       if (directionSchedule.empty())
         cout << "   Brak odjazdów" << endl;
-      else
-        for (const auto &time : directionSchedule)
-          cout << "   " << time << endl;
+      else {
+        vector<string> sortedSchedule = directionSchedule;
+        sort(sortedSchedule.begin(), sortedSchedule.end(),
+             [](const string &a, const string &b) {
+               return stoi(a.substr(0, 2)) * 60 + stoi(a.substr(3, 2)) <
+                      stoi(b.substr(0, 2)) * 60 + stoi(b.substr(3, 2));
+             });
+          for (const auto &time : sortedSchedule)
+            cout << "   " << time << endl;
+        }
     }
   }
 }
@@ -595,6 +612,7 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
     return;
   }
 
+  // Check this stuff
   map<Direction, vector<string>> schedule;
   for (auto direction : {Direction::A, Direction::B}) {
     vector<string> times;
@@ -603,13 +621,18 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
            << (direction == Direction::A ? "A" : "B") << ": ";
       string time;
       cin >> time;
-      times.push_back(time);
+      if (!Utils::isValidTimeFormat(time)) {
+        Utils::printErr("Nieprawidłowy format czasu. Użyj formatu HH:MM.");
+        continue;
+      } else {
+        times.push_back(time);
 
-      cout << "Czy chcesz dodać kolejny czas odjazdu? [tak/nie]: ";
-      string continueInput;
-      cin >> continueInput;
-      if (continueInput == "nie") {
-        break;
+        cout << "Czy chcesz dodać kolejny czas odjazdu? [tak/nie]: ";
+        string continueInput;
+        cin >> continueInput;
+        if (continueInput == "nie") {
+          break;
+        }
       }
     }
     schedule[direction] = times;
