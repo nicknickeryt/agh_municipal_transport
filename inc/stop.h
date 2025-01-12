@@ -31,13 +31,13 @@ public:
 
   bool operator==(const Stop &other) const;
 
-  static Stop& getStopById(vector<Stop> &stops, int stopId); 
+  static Stop &getStopById(vector<Stop> &stops, int stopId);
 
   friend class boost::serialization::access;
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
     (void)version;
-    ar & name;   
+    ar & name;
     ar & id;
   }
 };

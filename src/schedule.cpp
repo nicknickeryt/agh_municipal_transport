@@ -1,19 +1,19 @@
+#include <bits/stdc++.h>
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
-#include <bits/stdc++.h>
 
 #include "line.h"
 #include "schedule.h"
 #include "stop.h"
 #include "utils.h"
 
-using std::vector;
 using std::map;
 using std::string;
+using std::vector;
 
 map<Direction, vector<string>>
-Schedule::getLineScheduleForStop(Line& line, int stopId, ScheduleDay day) {
+Schedule::getLineScheduleForStop(Line &line, int stopId, ScheduleDay day) {
   map<Direction, vector<string>> schedule;
   for (auto direction : {Direction::A, Direction::B}) {
     for (auto [scheduleStopId, times] : line.getSchedule(day, direction)) {
@@ -25,7 +25,7 @@ Schedule::getLineScheduleForStop(Line& line, int stopId, ScheduleDay day) {
 }
 
 map<ScheduleDay, map<Direction, vector<string>>>
-Schedule::getLineScheduleForStop(Line& line, int stopId) {
+Schedule::getLineScheduleForStop(Line &line, int stopId) {
   map<ScheduleDay, map<Direction, vector<string>>> schedule;
   for (auto day :
        {ScheduleDay::WORKDAY, ScheduleDay::SATURDAY, ScheduleDay::HOLIDAY}) {

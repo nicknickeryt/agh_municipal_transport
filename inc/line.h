@@ -12,8 +12,8 @@
 #include "utils.h"
 
 using std::map;
-using std::vector;
 using std::string;
+using std::vector;
 
 class Line {
 private:
@@ -44,8 +44,7 @@ public:
   void setSchedule(ScheduleDay day, Direction direction, int stopId,
                    vector<string> times);
 
-  map<int, vector<string>> getSchedule(ScheduleDay day,
-                                            Direction direction);
+  map<int, vector<string>> getSchedule(ScheduleDay day, Direction direction);
   void setSchedule(ScheduleDay day, Direction direction,
                    map<int, vector<string>> schedule);
 

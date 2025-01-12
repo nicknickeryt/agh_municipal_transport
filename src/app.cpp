@@ -10,17 +10,17 @@
 #include "schedule.h"
 #include "stop.h"
 
-using std::string;
-using std::vector;
-using std::cout;
 using std::cin;
+using std::cout;
 using std::endl;
-using std::map;
 using std::exception;
-using std::to_string;
-using std::runtime_error;
 using std::ifstream;
+using std::map;
 using std::ofstream;
+using std::runtime_error;
+using std::string;
+using std::to_string;
+using std::vector;
 
 App &App::getInstance() {
   static App instance;
@@ -106,9 +106,9 @@ void App::showLineSchedule(
                return stoi(a.substr(0, 2)) * 60 + stoi(a.substr(3, 2)) <
                       stoi(b.substr(0, 2)) * 60 + stoi(b.substr(3, 2));
              });
-          for (const auto &time : sortedSchedule)
-            cout << "   " << time << endl;
-        }
+        for (const auto &time : sortedSchedule)
+          cout << "   " << time << endl;
+      }
     }
   }
 }

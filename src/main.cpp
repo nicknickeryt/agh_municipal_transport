@@ -1,9 +1,9 @@
-#include "utils.h"
 #include "app.h"
+#include "utils.h"
 
 int main() {
-  App& app = App::getInstance();
+  App &app = App::getInstance();
 
-  app.loadData(); 
+  app.loadData();
   app.run();
 }
