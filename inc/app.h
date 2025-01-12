@@ -21,6 +21,9 @@ private:
   App(const App &) = delete;
   App &operator=(const App &) = delete;
 
+  string adminPassword = "admin";
+  bool adminAuthenticated = 0;
+
   vector<Line> lines;
   vector<Stop> stops;
 
@@ -37,7 +40,6 @@ private:
 
   void showMainMenu();
 
-  int getUserInput();
 
   void handleMainMenu(int choice);
 

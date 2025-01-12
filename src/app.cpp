@@ -10,40 +10,28 @@ using namespace std;
 
 App &App::getInstance()
 {
-  static App instance; // Singleton
+  static App instance;
   return instance;
 }
 
 void App::run()
 {
-  while (true)
-  {
-    showMainMenu();
-    int choice = getUserInput();
-    handleMainMenu(choice);
-    if (choice == 4)
-      break; // Wyjście
-  }
+  showMainMenu();
 }
 
 App::App() {}
 
 void App::showMainMenu()
 {
-  cout << "\nAGH Municipal System\n";
+  cout << "\nAGH Municipal Transport System\n";
   cout << "[1] Przystanki\n";
   cout << "[2] Lista linii\n";
-  cout << "[3] Edycja\n";
+  cout << "[3] Edytor\n";
   cout << "[0] Wyjście\n";
   cout << "Wybierz opcję:\n";
-}
 
-int App::getUserInput()
-{
-  cout << "» ";
-  int choice;
-  cin >> choice;
-  return choice;
+  int choice = Utils::getUserInput(0, 3);
+  handleMainMenu(choice);
 }
 
 void App::handleMainMenu(int choice)
@@ -52,19 +40,22 @@ void App::handleMainMenu(int choice)
   {
   case 1:
     showStopsMenu();
+    showMainMenu();
     break;
   case 2:
     showLinesList();
+    showMainMenu();
     break;
   case 3:
     showEditorMenu();
+    showMainMenu();
     break;
   case 0:
-    cout << "Do widzenia!\n";
     exit(0);
     break;
   default:
-    cout << "Nieprawidłowy wybór!\n";
+    Utils::printErr(ERR_WRONG_CHOICE);
+    showMainMenu();
     break;
   }
 }
@@ -74,8 +65,8 @@ void App::showStopsMenu()
   cout << "\n[1] Lista przystanków\n";
   cout << "[2] Wyświetl rozkład przystanku\n";
   cout << "[3] Wyświetl rozkład przystanku dla danej linii\n";
-  cout << "[4] Powrót\n";
-  int choice = getUserInput();
+  cout << "[0] Powrót\n";
+  int choice = Utils::getUserInput(0, 3);
   handleStopsMenu(choice);
 }
 
@@ -96,9 +87,6 @@ void App::setDemoData()
   stops.push_back(szkola);
   stops.push_back(kabel);
 
-  lines.push_back(line1);
-  lines.push_back(line2);
-
   line1.setSchedule(ScheduleDay::WORKDAY, Direction::A,
                     {{1, {"10:00", "10:30"}},
                      {2, {"10:10", "10:40"}},
@@ -118,6 +106,9 @@ void App::setDemoData()
                     {{4, {"10:21", "10:51"}},
                      {3, {"10:31", "11:01"}},
                      {2, {"10:41", "11:11"}}});
+
+  lines.push_back(line1);
+  lines.push_back(line2);
 }
 
 void App::showLineSchedule(
@@ -145,8 +136,25 @@ void App::showLineSchedule(
 
 void App::showStopSchedule()
 {
-  cout << "Podaj ID przystanku\n";
-  int choice = getUserInput();
+  cout << "Podaj ID przystanku:" << endl;
+  int choice = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (choice < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
+
+  try
+  {
+    Stop stop = Stop::getStopById(stops, choice);
+  }
+  catch (const runtime_error &e)
+  {
+    cout << "[!] Nie znaleziono przystanku o podanym ID." << endl;
+    return;
+  }
+
   auto scheduleAll = Schedule::getAllSchedulesForStop(choice, lines);
 
   for (auto &[line, lineSchedule] : scheduleAll)
@@ -159,15 +167,42 @@ void App::showStopSchedule()
 
 void App::showStopScheduleForLine()
 {
-  cout << "Podaj ID przystanku\n";
-  int stopChoice = getUserInput();
+  cout << "Podaj ID przystanku" << endl;
+  int stopChoice = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (stopChoice < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
+
+  try
+  {
+    Stop stop = Stop::getStopById(stops, stopChoice);
+  }
+  catch (const runtime_error &e)
+  {
+    cout << "[!] Nie znaleziono przystanku o podanym ID." << endl;
+    return;
+  }
 
   cout << "Podaj numer linii\n";
-  int lineChoice = getUserInput();
+  int lineChoice = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
+  if (lineChoice < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   try
   {
     Line targetLine = Line::getLineById(lines, lineChoice);
+
+    if (!targetLine.hasStop(stopChoice))
+    {
+      Utils::printErr("Ta linia nie ma takiego przystanku na trasie.");
+      return;
+    }
 
     auto lineSchedule =
         Schedule::getLineScheduleForStop(targetLine, stopChoice);
@@ -176,7 +211,7 @@ void App::showStopScheduleForLine()
   }
   catch (const std::runtime_error &e)
   {
-    cout << "Nie ma takiej linii." << endl;
+    Utils::printErr(ERR_LINE_NOT_FOUND);
     return;
   }
 }
@@ -189,7 +224,7 @@ void App::handleStopsMenu(int choice)
     showStopsList();
     showStopsMenu();
     break;
-  case 2: 
+  case 2:
     showStopSchedule();
     showStopsMenu();
     break;
@@ -197,10 +232,12 @@ void App::handleStopsMenu(int choice)
     showStopScheduleForLine();
     showStopsMenu();
     break;
-  case 4:
-    return; 
+  case 0:
+    showMainMenu();
+    break;
   default:
-    cout << "Nieprawidłowy wybór!\n";
+    Utils::printErr(ERR_WRONG_CHOICE);
+    showStopsMenu();
     break;
   }
 }
@@ -230,7 +267,14 @@ bool handleNextStopAdd()
 
 void App::showLineAddMenu()
 {
-  int lineId = Utils::promptNumInput("Podaj numer nowej linii:");
+  cout << "Podaj numer nowej linii" << endl;
+  int lineId = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
+
+  if (lineId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   for (auto &line : lines)
     if (line.getNumber() == lineId)
@@ -246,8 +290,16 @@ void App::showLineAddMenu()
 
   while (1)
   {
-    int stopId =
-        Utils::promptNumInput("Podaj ID przystanku nr. " + to_string(i));
+
+    cout << "Podaj ID przystanku nr. " + to_string(i) << endl;
+
+    int stopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+    if (stopId < 0)
+    {
+      Utils::printErr(ERR_NAN);
+      return;
+    }
+
     try
     {
       Stop stop = Stop::getStopById(stops, stopId);
@@ -273,7 +325,14 @@ void App::showLineAddMenu()
 
 void App::showLineDeleteMenu()
 {
-  int lineId = Utils::promptNumInput("Podaj numer linii, którą chcesz usunąć.");
+  cout << "Podaj numer linii, którą chcesz usunąć." << endl;
+  int lineId = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
+  if (lineId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
+
   handleLineDeleteMenu(lineId);
 }
 
@@ -291,7 +350,7 @@ void App::handleLineDeleteMenu(int lineId)
   }
   catch (const runtime_error &e)
   {
-    cout << "[!] Nie znaleziono linii o podanym numerze." << endl;
+    Utils::printErr(ERR_LINE_NOT_FOUND);
   }
 }
 
@@ -301,7 +360,7 @@ void App::showLineEditMenu()
   cout << "[2] Usuń linię\n";
   cout << "[3] Edytuj linię\n";
   cout << "[0] Powrót\n";
-  int choice = getUserInput();
+  int choice = Utils::getUserInput(0, 3);
 
   handleLineEditMenu(choice);
 }
@@ -309,7 +368,7 @@ void App::showLineEditMenu()
 void App::showTargetLineNumberEditMenu(Line &targetLine)
 {
   cout << "Podaj nowy numer linii:" << endl;
-  int newLineNumber = getUserInput();
+  int newLineNumber = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
 
   try
   {
@@ -326,7 +385,13 @@ void App::showTargetLineNumberEditMenu(Line &targetLine)
 void App::showTargetLineStopDeleteMenu(Line &targetLine)
 {
   cout << "Podaj ID przystanku, który chcesz usunąć z trasy." << endl;
-  int stopId = getUserInput();
+  int stopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (stopId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   if (!targetLine.hasStop(stopId))
   {
@@ -361,7 +426,15 @@ void App::showTargetLineRoute(Line &targetLine)
 
 void App::showTargetLineStopAddMenu(Line &targetLine)
 {
-  int stopId = Utils::promptNumInput("Podaj ID przystanku:");
+  cout << "Podaj ID przystanku" << endl;
+
+  int stopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (stopId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   if (targetLine.hasStop(stopId))
   {
@@ -428,15 +501,21 @@ void App::showTargetLineEditor(Line &targetLine)
   cout << "[4] Dodaj przystanek do trasy\n";
   cout << "[5] Usuń linię\n";
   cout << "[0] Powrót\n";
-  int choice = getUserInput();
+  int choice = Utils::getUserInput(0, 5);
 
   handleTargetLineEditor(choice, targetLine);
 }
 
 void App::showTargetLineEditMenu()
 {
-  int lineId =
-      Utils::promptNumInput("Podaj numer linii, którą chcesz edytować.");
+  cout << "Podaj numer linii, którą chcesz edytować:" << endl;
+  int lineId = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
+
+  if (lineId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   try
   {
@@ -445,7 +524,7 @@ void App::showTargetLineEditMenu()
   }
   catch (const runtime_error &e)
   {
-    cout << "[!] Nie znaleziono linii o podanym numerze." << endl;
+    Utils::printErr(ERR_LINE_NOT_FOUND);
   }
 }
 
@@ -453,19 +532,23 @@ void App::handleLineEditMenu(int choice)
 {
   switch (choice)
   {
-  case 1: /* Utwórz linię */
+  case 1:
     showLineAddMenu();
+    showLineEditMenu();
     break;
-  case 2: /* Usuń linię */
+  case 2:
     showLineDeleteMenu();
+    showLineEditMenu();
     break;
-  case 3: /* Edytuj linię */
+  case 3:
     showTargetLineEditMenu();
+    showLineEditMenu();
     break;
   case 0:
-    return; // Powrót do głównego menu
+    showEditorMenu();
+    break;
   default:
-    cout << "[!] Nieprawidłowy wybór!\n";
+    Utils::printErr(ERR_WRONG_CHOICE);
     break;
   }
 }
@@ -477,9 +560,15 @@ void App::handleStopDelete(Stop &stop)
 
 void App::showStopDeleteMenu()
 {
-  cout << "Podaj ID przystanku, który chcesz usunąć" << endl;
+  cout << "Podaj ID przystanku, który chcesz usunąć:" << endl;
 
-  int choice = getUserInput();
+  int choice = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (choice < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   try
   {
@@ -506,7 +595,14 @@ void App::showStopDeleteMenu()
 
 void App::showStopAddMenu()
 {
-  int stopId = Utils::promptNumInput("Podaj ID nowego przystanku:");
+  cout << "Podaj ID nowego przystanku:" << endl;
+  int stopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (stopId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   for (auto &stop : stops)
   {
@@ -517,10 +613,7 @@ void App::showStopAddMenu()
     }
   }
 
-  cin.ignore(); // Ignore the newline character left in the buffer
-  string stopName;
-  cout << "Podaj nazwę nowego przystanku: ";
-  getline(cin, stopName);
+  string stopName = Utils::promptInput("Podaj nazwę nowego przystanku:");
 
   for (auto &stop : stops)
   {
@@ -539,10 +632,7 @@ void App::showStopAddMenu()
 
 void App::handleTargetStopNameChange(Stop &targetStop)
 {
-  cin.ignore(); // Ignore the newline character left in the buffer
-  string stopName;
-  cout << "Podaj nową nazwę przystanku: ";
-  getline(cin, stopName);
+  string stopName = Utils::promptInput("Podaj nową nazwę przystanku:");
 
   for (auto &stop : stops)
   {
@@ -558,7 +648,14 @@ void App::handleTargetStopNameChange(Stop &targetStop)
 
 void App::handleTargetStopIdChange(Stop &targetStop)
 {
-  int stopId = Utils::promptNumInput("Podaj nowe ID przystanku:");
+  cout << "Podaj nowe ID przystanku:" << endl;
+  int stopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (stopId < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   for (auto &stop : stops)
   {
@@ -571,12 +668,10 @@ void App::handleTargetStopIdChange(Stop &targetStop)
 
   for (auto &line : lines)
   {
-    // Update the route
     auto route = line.getRoute();
     replace(route.begin(), route.end(), targetStop.getId(), stopId);
     line.setRoute(route);
 
-    // Update the schedule
     auto schedule = line.getSchedule();
     for (auto &[day, daySchedule] : schedule)
     {
@@ -595,35 +690,37 @@ void App::handleTargetStopIdChange(Stop &targetStop)
   targetStop.setId(stopId);
 }
 
-void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
+void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine)
+{
   cout << "Podaj dzień rozkładu:\n";
   cout << "[0] Dzień roboczy\n";
   cout << "[1] Sobota\n";
   cout << "[2] Święta\n";
-  int dayInput = getUserInput();
+  int dayInput = Utils::getUserInput(0, 2);
 
   ScheduleDay scheduleDay = ScheduleDay::WORKDAY;
 
-  switch (dayInput) {
-    case 0:
-      break;
-    case 1:
-      scheduleDay = ScheduleDay::SATURDAY;
-      break;
-    case 2:
-      scheduleDay = ScheduleDay::HOLIDAY;
-      break;
-    default:
-      cout << "[!] Nieprawidłowy dzień tygodnia." << endl;
-      return;
+  switch (dayInput)
+  {
+  case 0:
+    break;
+  case 1:
+    scheduleDay = ScheduleDay::SATURDAY;
+    break;
+  case 2:
+    scheduleDay = ScheduleDay::HOLIDAY;
+    break;
+  default:
+    cout << "[!] Nieprawidłowy dzień tygodnia." << endl;
+    return;
   }
 
-
-
   map<Direction, vector<string>> schedule;
-  for (auto direction : {Direction::A, Direction::B}) {
+  for (auto direction : {Direction::A, Direction::B})
+  {
     vector<string> times;
-    while (true) {
+    while (true)
+    {
       cout << "Podaj czas odjazdu (HH:MM) dla kierunku " << (direction == Direction::A ? "A" : "B") << ": ";
       string time;
       cin >> time;
@@ -632,7 +729,8 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
       cout << "Czy chcesz dodać kolejny czas odjazdu? [tak/nie]: ";
       string continueInput;
       cin >> continueInput;
-      if (continueInput == "nie") {
+      if (continueInput == "nie")
+      {
         break;
       }
     }
@@ -645,9 +743,16 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
   cout << "[i] Rozkład został zaktualizowany." << endl;
 }
 
-void App::showTargetStopScheduleEditMenu(Stop &targetStop) {
-  cout << "Podaj numer linii, którą chcesz ustalić rozkład dla przystanku: ";
-  int lineNumber = getUserInput();
+void App::showTargetStopScheduleEditMenu(Stop &targetStop)
+{
+  cout << "Podaj numer linii, której chcesz ustalić rozkład dla przystanku: ";
+  int lineNumber = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
+
+  if (lineNumber < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   try
   {
@@ -656,7 +761,7 @@ void App::showTargetStopScheduleEditMenu(Stop &targetStop) {
   }
   catch (const runtime_error &e)
   {
-    cout << "[!] Nie znaleziono linii o podanym numerze." << endl;
+    Utils::printErr(ERR_LINE_NOT_FOUND);
   }
 }
 
@@ -684,7 +789,7 @@ void App::handleTargetStopEditor(Stop &targetStop, int choice)
     showStopEditMenu();
     break;
   default:
-    cout << "[!] Nieprawidłowy wybór!\n";
+    Utils::printErr(ERR_WRONG_CHOICE);
     showTargetStopEditor(targetStop);
     break;
   }
@@ -701,14 +806,20 @@ void App::showTargetStopEditor(Stop &targetStop)
   cout << "[0] Powrót\n";
   cout << "Wybierz opcję:\n";
 
-  int choice = getUserInput();
+  int choice = Utils::getUserInput(0, 4);
   handleTargetStopEditor(targetStop, choice);
 }
 
 void App::showTargetStopEditMenu()
 {
-  cout << "Podaj ID przystanku, który chcesz edytować" << endl;
-  int choice = getUserInput();
+  cout << "Podaj ID przystanku, który chcesz edytować:" << endl;
+  int choice = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (choice < 0)
+  {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
 
   try
   {
@@ -745,7 +856,7 @@ void App::handleStopEditMenu(int choice)
     showEditorMenu();
     break;
   default:
-    cout << "[!] Nieprawidłowy wybór!\n";
+    Utils::printErr(ERR_WRONG_CHOICE);
     showStopEditMenu();
     break;
   }
@@ -760,19 +871,31 @@ void App::showStopEditMenu()
   cout << "[0] Powrót\n";
   cout << "Wybierz opcję:\n";
 
-  int choice = getUserInput();
+  int choice = Utils::getUserInput(0, 4);
 
   handleStopEditMenu(choice);
 }
 
 void App::showEditorMenu()
 {
-  cout << "\n[1] Edytuj przystanek\n";
-  cout << "[2] Edytuj linie\n";
+  if (!adminAuthenticated)
+  {
+    string inputPass = Utils::promptInput("Podaj hasło administratora");
+
+    if (inputPass != adminPassword)
+    {
+      Utils::printErr("Nieprawidłowe hasło.");
+      return;
+    }
+    adminAuthenticated = 1;
+  }
+
+  cout << "\n[1] Edytor przystanków\n";
+  cout << "[2] Edytor linii\n";
   cout << "[0] Powrót\n";
   cout << "Wybierz opcję:\n";
 
-  int choice = getUserInput();
+  int choice = Utils::getUserInput(0, 2);
   handleEditorMenu(choice);
 }
 
@@ -780,16 +903,18 @@ void App::handleEditorMenu(int choice)
 {
   switch (choice)
   {
-  case 1: /* Edytuj przystanek */
+  case 1:
     showStopEditMenu();
     break;
-  case 2: /* Edytuj linię */
+  case 2:
     showLineEditMenu();
     break;
   case 0:
-    return; // Powrót do głównego menu
+    showMainMenu();
+    return;
   default:
-    cout << "Nieprawidłowy wybór!\n";
+    Utils::printErr(ERR_WRONG_CHOICE);
+    showEditorMenu();
     break;
   }
 }

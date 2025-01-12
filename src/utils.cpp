@@ -8,6 +8,19 @@
 
 using namespace std;
 
+int Utils::getUserInput(int min, int max) {
+  cout << "» ";
+
+  string input;
+  cin >> input;
+
+  if(!validateInt(input)) return -1;
+  
+  int choice = stoi(input);
+  return (choice >= min && choice <= max) ? choice : -1;
+}
+
+
 string Utils::getScheduleDayName(ScheduleDay day) {
   switch (day) {
   case ScheduleDay::WORKDAY:
@@ -33,7 +46,7 @@ int Utils::promptSel() {
             std::istringstream(input) >> ret;
             break;
         }
-        printErr("ERR_NAN");
+        printErr(ERR_NAN);
     }
     return ret;
 }
@@ -54,7 +67,7 @@ int Utils::promptSel(const map<int, string> promptMap) {
             std::istringstream(input) >> ret;
             break;
         }
-        printErr("ERR_NAN");
+        printErr(ERR_NAN);
     }
     return ret;
 }
@@ -73,11 +86,14 @@ string Utils::promptInput() {
 }
 
 string Utils::promptInput(const string promptText) {
+
     cout << promptText << endl;
 
     string ret{};
     cout << "» ";
-    cin >> ret;
+
+    cin.ignore();
+    getline(cin, ret);
     return ret;
 }
 
@@ -90,4 +106,4 @@ int Utils::promptNumInput(const string promptText) {
     return ret;
 }
 
-void Utils::printErr(const string errText) { cout << "[ ! ] " << errText << endl; }
+void Utils::printErr(const string errText) { cout << "[!] " << errText << endl; }
