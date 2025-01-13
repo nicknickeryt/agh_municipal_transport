@@ -11,6 +11,7 @@
 using std::map;
 using std::string;
 using std::vector;
+using std::pair;
 
 class Schedule {
 public:
@@ -22,6 +23,8 @@ public:
 
   static map<Line, map<ScheduleDay, map<Direction, vector<string>>>>
   getAllSchedulesForStop(int stopId, vector<Line> &lines);
+
+  static vector<map<Line, pair<int, int>>> findConnection(int startStopId, int endStopId, vector<Line> &lines);
 };
 
 #endif // SCHEDULE_H

@@ -36,11 +36,12 @@ void App::showMainMenu() {
   cout << "\nAGH Municipal Transport System\n";
   cout << "[1] Przystanki\n";
   cout << "[2] Lista linii\n";
-  cout << "[3] Edytor\n";
+  cout << "[3] Wyszukaj połączenie\n";
+  cout << "[4] Edytor\n";
   cout << "[0] Wyjście\n";
   cout << "Wybierz opcję:\n";
 
-  int choice = Utils::getUserInput(0, 3);
+  int choice = Utils::getUserInput(0, 4);
   handleMainMenu(choice);
 }
 
@@ -55,6 +56,10 @@ void App::handleMainMenu(int choice) {
     showMainMenu();
     break;
   case 3:
+    showConnectionFinder();
+    showMainMenu();
+    break;
+  case 4:
     showEditorMenu();
     showMainMenu();
     break;
@@ -685,7 +690,8 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
 }
 
 void App::showTargetStopScheduleEditMenu(Stop &targetStop) {
-  cout << "Podaj numer linii, której chcesz ustalić rozkład dla przystanku: " << endl;
+  cout << "Podaj numer linii, której chcesz ustalić rozkład dla przystanku: "
+       << endl;
   int lineNumber = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
 
   if (lineNumber < 0) {
@@ -696,7 +702,7 @@ void App::showTargetStopScheduleEditMenu(Stop &targetStop) {
   try {
     Line &line = Line::getLineById(lines, lineNumber);
 
-    if(!line.hasStop(targetStop.getId())) {
+    if (!line.hasStop(targetStop.getId())) {
       Utils::printErr("Ta linia nie ma takiego przystanku na trasie.");
       return;
     }
@@ -905,6 +911,52 @@ void App::loadData() {
     } catch (const exception &e) {
       Utils::printErr(
           "Wystąpił błąd podczas ładowania danych! Sprawdź poprawność plików");
+    }
+  }
+}
+
+void App::showConnectionFinder() {
+  cout << "Podaj ID przystanku początkowego:" << endl;
+  int startStopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (startStopId < 0) {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
+
+  try {
+    Stop startStop = Stop::getStopById(stops, startStopId);
+  } catch (const runtime_error &e) {
+    cout << "[!] Nie znaleziono przystanku o podanym ID." << endl;
+    return;
+  }
+
+  cout << "Podaj ID przystanku końcowego:" << endl;
+  int endStopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
+
+  if (endStopId < 0) {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
+
+  try {
+    Stop endStop = Stop::getStopById(stops, endStopId);
+  } catch (const runtime_error &e) {
+    cout << "[!] Nie znaleziono przystanku o podanym ID." << endl;
+    return;
+  }
+
+  auto testSchedule = Schedule::findConnection(startStopId, endStopId, lines);
+  if(testSchedule.empty()) {
+    Utils::printErr("Nie znaleziono połączenia.");
+    return;
+  }
+  cout << "[i] Znaleziono połączenie:" << endl;
+  for (const auto &connection : testSchedule) {
+    for (const auto &kvp : connection) {
+      cout << " [" << kvp.first.getNumber() << "] "
+         << Stop::getStopById(stops, kvp.second.first).getName() << " -> "
+         << Stop::getStopById(stops, kvp.second.second).getName() << endl;
     }
   }
 }
