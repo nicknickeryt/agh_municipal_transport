@@ -7,6 +7,7 @@
 
 #include "line.h"
 #include "stop.h"
+#include "enums.h"
 
 using std::map;
 using std::string;
@@ -31,17 +32,6 @@ private:
 
   vector<Line> lines;
   vector<Stop> stops;
-
-  Stop plac = Stop("Plac Centralny", 1);
-  Stop dworzec = Stop("Dworzec", 2);
-  Stop szkola = Stop("Szkoła", 3);
-  Stop kabel = Stop("Kabel", 4);
-
-  vector<int> route1 = {1, 2, 3};
-  vector<int> route2 = {4, 3, 2};
-
-  Line line1 = Line(1, route1);
-  Line line2 = Line(2, route2);
 
   void showMainMenu();
 

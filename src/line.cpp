@@ -11,11 +11,24 @@ using std::vector;
 using std::string;
 using std::runtime_error;
 
-Line::Line(int number, vector<int> &route) : number(number), route(route) {}
-Line::Line(int number) : number(number) {}
+Line::Line(int number, TransportType lineType) : number(number), lineType(lineType) {}
+Line::Line(int number, TransportType lineType, vector<int> &route) : number(number), lineType(lineType), route(route) {}
 
 int Line::getNumber() const { return number; }
 void Line::setNumber(int number) { this->number = number; }
+
+TransportType Line::getType() const { return lineType; }
+string Line::getTypeString() const {
+  switch (lineType) {
+  case TransportType::BUS:
+    return "autobus";
+  case TransportType::TRAM:
+    return "tramwaj";
+  default:
+    throw runtime_error("Unknown TransportType");
+  }
+}
+void Line::setType(TransportType type) { lineType = type; }
 
 vector<int> Line::getRoute() { return route; }
 void Line::setRoute(vector<int> &route) { this->route = route; }

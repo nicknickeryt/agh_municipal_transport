@@ -9,6 +9,7 @@
 #include "app.h"
 #include "schedule.h"
 #include "stop.h"
+#include "utils.h"
 
 using std::cin;
 using std::cout;
@@ -80,7 +81,8 @@ void App::showStopsMenu() {
 void App::showStopsList() {
   cout << "[i] Lista przystanków:\n";
   for (auto &stop : stops) {
-    cout << " » [" << stop.getId() << "] " << stop.getName() << endl;
+    cout << " » [" << stop.getId() << "] " << stop.getName() << " ["
+         << stop.getTypeString() << "]" << endl;
   }
 }
 
@@ -210,7 +212,7 @@ void App::showLinesList() {
          << Stop::getStopById(stops, line.getTargetStop(Direction::B)).getName()
          << " <-> "
          << Stop::getStopById(stops, line.getTargetStop(Direction::A)).getName()
-         << endl;
+         << " [" << line.getTypeString() << "]" << endl;
   }
 }
 
@@ -240,13 +242,25 @@ void App::showLineAddMenu() {
       return;
     }
 
+  cout << "Wybierz typ linii:" << endl;
+  cout << "[0] Autobus" << endl;
+  cout << "[1] Tramwaj" << endl;
+  int lineTypeChoice = Utils::getUserInput(0, 1);
+
+  if (lineTypeChoice < 0) {
+    Utils::printErr(ERR_NAN);
+    return;
+  }
+
+  TransportType lineType =
+      (lineTypeChoice == 0) ? TransportType::BUS : TransportType::TRAM;
+
   vector<int> route{};
 
   cout << "Podaj trasę linii:" << endl;
   uint32_t i = 1;
 
   while (1) {
-
     cout << "Podaj ID przystanku nr. " + to_string(i) << endl;
 
     int stopId = Utils::getUserInput(MIN_STOP_ID, MAX_STOP_ID);
@@ -257,6 +271,11 @@ void App::showLineAddMenu() {
 
     try {
       Stop stop = Stop::getStopById(stops, stopId);
+      if (stop.getType() != lineType) {
+        cout << "[!] To jest przystanek typu " << stop.getTypeString() << endl;
+        continue;
+        ;
+      }
       route.push_back(stopId);
     } catch (const runtime_error &e) {
       cout << "[!] Nie ma przystanku o takim ID." << endl;
@@ -269,7 +288,7 @@ void App::showLineAddMenu() {
       break;
   }
 
-  Line line(lineId, route);
+  Line line(lineId, lineType, route);
   lines.push_back(line);
 
   cout << "Dodano linię." << endl;
@@ -300,11 +319,13 @@ void App::handleLineDeleteMenu(int lineId) {
 }
 
 void App::showLineEditMenu() {
+  cout << "Edytor linii\n";
   cout << "\n[1] Utwórz linię\n";
   cout << "[2] Usuń linię\n";
   cout << "[3] Edytuj linię\n";
+  cout << "[4] Lista linii\n";
   cout << "[0] Powrót\n";
-  int choice = Utils::getUserInput(0, 3);
+  int choice = Utils::getUserInput(0, 4);
 
   handleLineEditMenu(choice);
 }
@@ -374,11 +395,18 @@ void App::showTargetLineStopAddMenu(Line &targetLine) {
   }
   try {
     Stop stop = Stop::getStopById(stops, stopId);
+
+    if (stop.getType() != targetLine.getType()) {
+      cout << "[!] To jest przystanek typu " << stop.getTypeString() << endl;
+      return;
+    }
+
     auto route = targetLine.getRoute();
     route.push_back(stopId);
     targetLine.setRoute(route);
+    cout << "Dodano przystanek do trasy." << endl;
   } catch (const runtime_error &e) {
-    cout << "[!] Nie ma przystanku o takim ID." << endl;
+    Utils::printErr("[!] Nie ma przystanku o takim ID.");
     return;
   }
 }
@@ -416,13 +444,13 @@ void App::handleTargetLineEditor(int choice, Line &targetLine) {
 }
 
 void App::showTargetLineEditor(Line &targetLine) {
-  cout << "Edycja: [" << targetLine.getNumber() << "] "
+  cout << "Edycja linii: [" << targetLine.getNumber() << "] "
        << Stop::getStopById(stops, targetLine.getTargetStop(Direction::B))
               .getName()
        << " <-> "
        << Stop::getStopById(stops, targetLine.getTargetStop(Direction::A))
               .getName()
-       << endl;
+       << " [" << targetLine.getTypeString() << "]" << endl;
 
   cout << "\n[1] Wyświetl całą trasę\n";
   cout << "[2] Zmień numer\n";
@@ -464,6 +492,10 @@ void App::handleLineEditMenu(int choice) {
     break;
   case 3:
     showTargetLineEditMenu();
+    showLineEditMenu();
+    break;
+  case 4:
+    showLinesList();
     showLineEditMenu();
     break;
   case 0:
@@ -527,14 +559,20 @@ void App::showStopAddMenu() {
 
   string stopName = Utils::promptInput("Podaj nazwę nowego przystanku:");
 
-  for (auto &stop : stops) {
-    if (stop.getName() == stopName) {
-      cout << "[!] Przystanek o takiej nazwie już istnieje." << endl;
-      return;
-    }
+  cout << "Wybierz typ przystanku:" << endl;
+  cout << "[0] Autobus" << endl;
+  cout << "[1] Tramwaj" << endl;
+  int stopTypeChoice = Utils::getUserInput(0, 1);
+
+  if (stopTypeChoice < 0) {
+    Utils::printErr(ERR_NAN);
+    return;
   }
 
-  Stop newStop(stopName, stopId);
+  TransportType stopType =
+      (stopTypeChoice == 0) ? TransportType::BUS : TransportType::TRAM;
+
+  Stop newStop(stopName, stopId, stopType);
   stops.push_back(newStop);
 
   cout << "[i] Przystanek został dodany." << endl;
@@ -647,7 +685,7 @@ void App::showTargetStopScheduleEditor(Stop &targetStop, Line &targetLine) {
 }
 
 void App::showTargetStopScheduleEditMenu(Stop &targetStop) {
-  cout << "Podaj numer linii, której chcesz ustalić rozkład dla przystanku: ";
+  cout << "Podaj numer linii, której chcesz ustalić rozkład dla przystanku: " << endl;
   int lineNumber = Utils::getUserInput(MIN_LINE_ID, MAX_LINE_ID);
 
   if (lineNumber < 0) {
@@ -657,6 +695,12 @@ void App::showTargetStopScheduleEditMenu(Stop &targetStop) {
 
   try {
     Line &line = Line::getLineById(lines, lineNumber);
+
+    if(!line.hasStop(targetStop.getId())) {
+      Utils::printErr("Ta linia nie ma takiego przystanku na trasie.");
+      return;
+    }
+
     showTargetStopScheduleEditor(targetStop, line);
   } catch (const runtime_error &e) {
     Utils::printErr(ERR_LINE_NOT_FOUND);
@@ -693,7 +737,8 @@ void App::handleTargetStopEditor(Stop &targetStop, int choice) {
 
 void App::showTargetStopEditor(Stop &targetStop) {
   cout << "Edycja przystanku: [" << targetStop.getId() << "] "
-       << targetStop.getName() << endl;
+       << targetStop.getName() << " [" << targetStop.getTypeString() << "]"
+       << endl;
 
   cout << "[1] Zmień nazwę\n";
   cout << "[2] Zmień ID\n";
@@ -838,23 +883,28 @@ void App::saveData() {
 
 void App::loadData() {
   {
-    ifstream ifLines(LINES_DAT_FILE);
-    ifstream ifStops(STOPS_DAT_FILE);
-    ifstream ifAuth(AUTH_DAT_FILE);
+    try {
+      ifstream ifLines(LINES_DAT_FILE);
+      ifstream ifStops(STOPS_DAT_FILE);
+      ifstream ifAuth(AUTH_DAT_FILE);
 
-    if (!ifLines.is_open() || !ifStops.is_open() || !ifAuth.is_open()) {
-      Utils::printErr("Pliki konfiguracyjne nie zostały znalezione. Nie "
-                      "załadowano żadnych danych.");
-      return;
+      if (!ifLines.is_open() || !ifStops.is_open() || !ifAuth.is_open()) {
+        Utils::printErr("Pliki konfiguracyjne nie zostały znalezione. Nie "
+                        "załadowano żadnych danych.");
+        return;
+      }
+
+      boost::archive::text_iarchive arLines(ifLines);
+      arLines & lines;
+
+      boost::archive::text_iarchive arStops(ifStops);
+      arStops & stops;
+
+      boost::archive::text_iarchive arAuth(ifAuth);
+      arAuth & adminPassword;
+    } catch (const exception &e) {
+      Utils::printErr(
+          "Wystąpił błąd podczas ładowania danych! Sprawdź poprawność plików");
     }
-
-    boost::archive::text_iarchive arLines(ifLines);
-    arLines & lines;
-
-    boost::archive::text_iarchive arStops(ifStops);
-    arStops & stops;
-
-    boost::archive::text_iarchive arAuth(ifAuth);
-    arAuth & adminPassword;
   }
 }

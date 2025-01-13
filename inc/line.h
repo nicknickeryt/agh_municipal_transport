@@ -9,7 +9,7 @@
 #include <boost/serialization/vector.hpp>
 
 #include "stop.h"
-#include "utils.h"
+#include "enums.h"
 
 using std::map;
 using std::string;
@@ -18,16 +18,21 @@ using std::vector;
 class Line {
 private:
   int number;
+  TransportType lineType;
   vector<int> route;
   map<ScheduleDay, map<Direction, map<int, vector<string>>>> schedule;
 
 public:
   Line() = default;
-  Line(int number);
-  Line(int number, vector<int> &route);
+  Line(int number, TransportType lineType);
+  Line(int number, TransportType lineType, vector<int> &route);
 
   int getNumber() const;
   void setNumber(int number);
+
+  TransportType getType() const;
+  string getTypeString() const;
+  void setType(TransportType type);
 
   vector<int> getRoute();
   void setRoute(vector<int> &route);
@@ -59,6 +64,7 @@ public:
   void serialize(Archive &ar, const unsigned int version) {
     (void)version;
     ar & number;
+    ar & lineType;
     ar & route;
     ar & schedule;
   }

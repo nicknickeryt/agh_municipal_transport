@@ -4,11 +4,10 @@
 #include <map>
 #include <string>
 
+#include "enums.h"
+
 using std::string;
 using std::map;
-
-enum class Direction { A, B };
-enum class ScheduleDay { WORKDAY, SATURDAY, HOLIDAY };
 
 #define MIN_LINE_ID 0
 #define MAX_LINE_ID 2147483647

@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+#include "enums.h"
+#include "line.h"
+
 using std::map;
 using std::string;
 using std::vector;

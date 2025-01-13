@@ -6,6 +6,7 @@
 #include <string>
 
 #include "utils.h"
+#include "schedule.h"
 
 using std::cin;
 using std::cout;

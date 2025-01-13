@@ -8,6 +8,8 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include "enums.h"
+
 using std::string;
 using std::vector;
 
@@ -15,17 +17,21 @@ class Stop {
 private:
   string name;
   int id;
+  TransportType stopType;
 
 public:
   Stop() = default;
-  Stop(string name);
-  Stop(string name, int id);
+  Stop(string name, int id, TransportType stopType);
 
   string getName() const;
   void setName(string name);
 
   int getId() const;
   void setId(int id);
+
+  TransportType getType() const;
+  string getTypeString() const;
+  void setType(TransportType type);
 
   bool operator<(const Stop &other) const;
 
@@ -39,6 +45,7 @@ public:
     (void)version;
     ar & name;
     ar & id;
+    ar & stopType;
   }
 };
 
