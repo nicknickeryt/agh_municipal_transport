@@ -22,9 +22,9 @@ using std::string;
 #define ERR_LINE_NOT_FOUND "Nie znaleziono linii o podanym numerze."
 
 // Storage file locations
-#define LINES_DAT_FILE "../lines.dat"
-#define STOPS_DAT_FILE "../stops.dat"
-#define AUTH_DAT_FILE "../auth.dat"
+#define LINES_DAT_FILE "lines.dat"
+#define STOPS_DAT_FILE "stops.dat"
+#define AUTH_DAT_FILE "auth.dat"
 
 /**
  * @class Utils
