@@ -17,6 +17,8 @@ FetchContent_Declare(
 )
 set(BOOST_INCLUDE_LIBRARIES serialization)
 set(BOOST_ENABLE_CMAKE ON)
+
+message("Downloading Boost sources, please wait...")
 FetchContent_MakeAvailable(Boost)
 
 include_directories( inc )
